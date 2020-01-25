@@ -1,0 +1,64 @@
+#include <sstream>
+#include <string>
+#include <iostream>
+
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv/imgproc/imgproc.hpp"
+
+using namespace std;
+using namespace cv;
+
+
+// itiallizing min and max HSV filter values, these are changed with trackbars
+int H_MIN = 0;
+int S_MIN = 0;
+int V_MIN = 0;
+int H_MAX = 256;
+int S_MAX = 256;
+int V_MAX = 256;
+
+int main( int argc, const char** argv )
+{
+    //capture video from camera
+    VideoCapture cap(0);
+
+    //If it doesn't work, exit the program
+    if(!cap.isOpened())
+    {
+        cout << "Cannot open the camera" << endl;
+        return -1;
+    }
+
+    //idk wtf this is for...
+    //JK this creates a window for the camera feed
+    //
+    Mat frame;
+    const char win_name[]="Live Video...";
+    const chr file_out[]="recorded.avi";
+    //webcam connected to the USB port
+    int cam_id=0;
+    double fps = 20;
+
+    if (RGC == 2)
+        sscanf(argv[1], "%d", &cam_id);
+
+    //Opening camera
+    VideoCapture inVid(cam_id);
+    if (!inVid.isOpened())
+        return -1;
+
+    //Reading frame from camera
+    //writing it to video file
+    //show the frame
+    nameWindow(win_name);
+    while (1) {
+        inVid >> frame;
+        recVid << frame;
+        imShow(win_name, frame);
+        if (waitkey(1000/fps) >= 0)
+            break;
+    }
+    inVid.release();
+    return 0;
+}
