@@ -13,8 +13,57 @@
 using namespace cv;
 using namespace std;
 
-int thresh = 50, N = 10;
+int thresh = 50, N = 5;
 const char* wndname = "Square Detection";
+const string trackbarWindowName = "Trackbars";
+
+string intToString(int number){
+
+
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
+}
+
+
+    //hue (0 - 256)
+    // max = 38 for yellow
+    int H_MIN = 25;
+    int H_MAX = 100;
+
+    //saturation (0 - 256)
+    int S_MIN = 35;    
+    int S_MAX = 256;
+
+    //value (0 - 256)
+    int V_MIN = 130;
+    int V_MAX = 256;
+
+void on_trackbar( int, void* )
+{//This function gets called whenever a
+	// trackbar position is changed
+}
+
+void createTrackbars(){
+	//create window for trackbars
+
+
+    namedWindow(trackbarWindowName,0);
+
+	//create trackbars and insert them into window
+	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
+	//the max value the trackbar can move (eg. H_HIGH), 
+	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
+	//                                  ---->    ---->     ---->      
+    createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
+    createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
+    createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
+    createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
+    createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
+    createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
+
+
+}
 
 // helper function:
 // finds a cosine of angle between vectors
@@ -83,7 +132,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
             {
                 // approximate contour with accuracy proportional
                 // to the contour perimeter
-                approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true)*0.05, true);
+                approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true)*0.06, true);
 
                 // square contours should have 4 vertices after approximation
                 // relatively large area (to filter out noisy contours)
@@ -107,7 +156,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
                     // if cosines of all angles are small
                     // (all angles are ~90 degree) then write quandrange
                     // vertices to resultant sequence
-                    if( maxCosine < 0.3 )
+                    if( maxCosine < 5)
                         squares.push_back(approx);
                 }
             }
@@ -123,7 +172,7 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     {
         const Point* p = &squares[i][0];
         int n = (int)squares[i].size();
-        polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, CV_8U);
+        polylines(image, &p, &n, 1, true, Scalar(0,255, 255), 3, CV_8U);
     }
 
     imshow(wndname, image);
@@ -143,28 +192,6 @@ int main(int /*argc*/, char** /*argv*/)
     namedWindow(wndname, 1);
     vector<vector<Point> > squares;
 
-    //hue (0 - 256)
-    // max = 38 for yellow
-    int H_MIN = 15;
-    int H_MAX = 69;
-
-    //saturation (0 - 256)
-    int S_MIN = 50;    
-    int S_MAX = 255;
-
-    //value (0 - 256)
-    int V_MIN = 100;
-    int V_MAX = 256;
-
-    // //trackbars, might get rid of these later...might be cool we'll see
-    // cvCreateTrackbar("H_MIN", "Control", &H_MIN, 38);
-    // cvCreateTrackbar("H_MAX", "Control", &H_MAX, 38);
-
-    // cvCreateTrackbar("S_MIN", "Control", &S_MIN, 256);
-    // cvCreateTrackbar("S_MAX", "Control", &S_MAX, 256);
-
-    // cvCreateTrackbar("V_MIN", "Control", &V_MIN, 256);
-    // cvCreateTrackbar("V_MAX", "Control", &V_MAX, 256);
 
     while (true)
     {
@@ -191,24 +218,30 @@ int main(int /*argc*/, char** /*argv*/)
         Mat imgThresholded;
         inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
 
-        // findSquares(imgThresholded, squares);
-        // drawSquares(imgThresholded, squares);
-      
+        GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
         //morphological opening (remove small objects from the foreground)
-       // erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
 
         //morphological closing (fill small holes in the foreground)
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        findSquares(imgThresholded, squares);
-        drawSquares(imgThresholded, squares);
+        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
+        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+
+        //do it again
+        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+
+        
+        //createTrackbars();
 
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
         imshow("Original", imgOriginal); //show the original image
+
+        findSquares(imgThresholded, squares);
+        drawSquares(imgThresholded, squares);
+
         if (waitKey(30) == 27)
         {
-            cout << "esc key is pressed by user" << endl;
+            cout << "ya broke it :( " << endl;
             break; 
        }
     }
@@ -216,28 +249,3 @@ int main(int /*argc*/, char** /*argv*/)
    return 0;
 
 }
-
-//     static const char* names[] = { "imgs/2Stickies.jpg", "imgs/manyStickies.jpg",0 };
-//     help();
-//     namedWindow( wndname, 1 );
-//     vector<vector<Point> > squares;
-
-//     for( int i = 0; names[i] != 0; i++ )
-//     {
-//         Mat image = imread(names[i], 1);
-//         if( image.empty() )
-//         {
-//             cout << "Couldn't load " << names[i] << endl;
-//             continue;
-//         }
-
-//         findSquares(image, squares);
-//         drawSquares(image, squares);
-//         //imwrite( "out", image );
-//         int c = waitKey();
-//         if( (char)c == 27 )
-//             break;
-//     }
-
-//     return 0;
-// }
