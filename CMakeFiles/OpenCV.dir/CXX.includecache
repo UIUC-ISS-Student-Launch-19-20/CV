@@ -19,6 +19,18 @@ math.h
 -
 string.h
 -
+opencv2/core/core.hpp
+/home/angelina/CV/opencv2/core/core.hpp
+opencv2/imgproc/imgproc.hpp
+/home/angelina/CV/opencv2/imgproc/imgproc.hpp
+opencv2/highgui/highgui.hpp
+/home/angelina/CV/opencv2/highgui/highgui.hpp
+iostream
+-
+math.h
+-
+string.h
+-
 
 /usr/local/include/opencv4/opencv2/calib3d.hpp
 opencv2/core.hpp

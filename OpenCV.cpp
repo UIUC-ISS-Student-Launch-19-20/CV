@@ -13,7 +13,7 @@
 using namespace cv;
 using namespace std;
 
-int thresh = 50, N = 5;
+int thresh = 50, N = 10;
 const char* wndname = "Square Detection";
 
 // helper function:
@@ -34,22 +34,20 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 {
     squares.clear();
 
-//s    Mat pyr, timg, gray0(image.size(), CV_8U), gray;
+    Mat pyr, timg, gray0(image.size(), CV_8U), gray;
 
     // down-scale and upscale the image to filter out the noise
-    //pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
-    //pyrUp(pyr, timg, image.size());
+    pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
+    pyrUp(pyr, timg, image.size());
 
-
-    // blur will enhance edge detection
-    Mat timg(image);
-    medianBlur(image, timg, 9);
-    Mat gray0(timg.size(), CV_8U), gray;
+    // Mat timg(image);
+    // medianBlur(image, timg, 9);
+    // Mat gray0(timg.size(), CV_8U), gray;
 
     vector<vector<Point> > contours;
 
     // find squares in every color plane of the image
-    for( int c = 0; c < 3; c++ )
+    for( int c = 0; c < image.channels(); c++ )
     {
         int ch[] = {c, 0};
         mixChannels(&timg, 1, &gray0, 1, ch, 1);
@@ -63,7 +61,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
             {
                 // apply Canny. Take the upper threshold from slider
                 // and set the lower to 0 (which forces edges merging)
-                Canny(gray0, gray, 5, thresh, 5);
+                Canny(gray0, gray, 0, thresh, 5);
                 // dilate canny output to remove potential
                 // holes between edge segments
                 dilate(gray, gray, Mat(), Point(-1,-1));
@@ -85,7 +83,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
             {
                 // approximate contour with accuracy proportional
                 // to the contour perimeter
-                approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true)*0.02, true);
+                approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true)*0.05, true);
 
                 // square contours should have 4 vertices after approximation
                 // relatively large area (to filter out noisy contours)
@@ -124,16 +122,11 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     for( size_t i = 0; i < squares.size(); i++ )
     {
         const Point* p = &squares[i][0];
-
         int n = (int)squares[i].size();
-        //dont detect the border
-        if (p-> x > 3 && p->y > 3)
-          polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, LINE_AA);
+        polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, CV_8U);
     }
 
     imshow(wndname, image);
-
-
 }
 
 
@@ -146,7 +139,7 @@ int main(int /*argc*/, char** /*argv*/)
         return -1;
     }
 
-    Mat image;
+    //Mat image;
     namedWindow(wndname, 1);
     vector<vector<Point> > squares;
 
@@ -156,12 +149,12 @@ int main(int /*argc*/, char** /*argv*/)
     int H_MAX = 69;
 
     //saturation (0 - 256)
-    int S_MIN = 100;    
+    int S_MIN = 50;    
     int S_MAX = 255;
 
     //value (0 - 256)
     int V_MIN = 100;
-    int V_MAX = 255;
+    int V_MAX = 256;
 
     // //trackbars, might get rid of these later...might be cool we'll see
     // cvCreateTrackbar("H_MIN", "Control", &H_MIN, 38);
@@ -208,6 +201,8 @@ int main(int /*argc*/, char** /*argv*/)
         //morphological closing (fill small holes in the foreground)
         //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
         //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        findSquares(imgThresholded, squares);
+        drawSquares(imgThresholded, squares);
 
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
         imshow("Original", imgOriginal); //show the original image

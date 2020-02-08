@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named OpenCV
+# Target rules for targets named squares
 
 # Build rule for target.
-OpenCV: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 OpenCV
-.PHONY : OpenCV
+squares: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 squares
+.PHONY : squares
 
 # fast build rule for target.
-OpenCV/fast:
-	$(MAKE) -f CMakeFiles/OpenCV.dir/build.make CMakeFiles/OpenCV.dir/build
-.PHONY : OpenCV/fast
+squares/fast:
+	$(MAKE) -f CMakeFiles/squares.dir/build.make CMakeFiles/squares.dir/build
+.PHONY : squares/fast
 
 OpenCV.o: OpenCV.cpp.o
 
@@ -129,7 +129,7 @@ OpenCV.o: OpenCV.cpp.o
 
 # target to build an object file
 OpenCV.cpp.o:
-	$(MAKE) -f CMakeFiles/OpenCV.dir/build.make CMakeFiles/OpenCV.dir/OpenCV.cpp.o
+	$(MAKE) -f CMakeFiles/squares.dir/build.make CMakeFiles/squares.dir/OpenCV.cpp.o
 .PHONY : OpenCV.cpp.o
 
 OpenCV.i: OpenCV.cpp.i
@@ -138,7 +138,7 @@ OpenCV.i: OpenCV.cpp.i
 
 # target to preprocess a source file
 OpenCV.cpp.i:
-	$(MAKE) -f CMakeFiles/OpenCV.dir/build.make CMakeFiles/OpenCV.dir/OpenCV.cpp.i
+	$(MAKE) -f CMakeFiles/squares.dir/build.make CMakeFiles/squares.dir/OpenCV.cpp.i
 .PHONY : OpenCV.cpp.i
 
 OpenCV.s: OpenCV.cpp.s
@@ -147,7 +147,7 @@ OpenCV.s: OpenCV.cpp.s
 
 # target to generate assembly for a file
 OpenCV.cpp.s:
-	$(MAKE) -f CMakeFiles/OpenCV.dir/build.make CMakeFiles/OpenCV.dir/OpenCV.cpp.s
+	$(MAKE) -f CMakeFiles/squares.dir/build.make CMakeFiles/squares.dir/OpenCV.cpp.s
 .PHONY : OpenCV.cpp.s
 
 # Help Target
@@ -157,7 +157,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... OpenCV"
+	@echo "... squares"
 	@echo "... edit_cache"
 	@echo "... OpenCV.o"
 	@echo "... OpenCV.i"
