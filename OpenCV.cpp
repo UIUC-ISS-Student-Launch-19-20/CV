@@ -28,11 +28,11 @@ string intToString(int number){
 
     //hue (0 - 256)
     // max = 38 for yellow
-    int H_MIN = 25;
+    int H_MIN = 20;
     int H_MAX = 100;
 
     //saturation (0 - 256)
-    int S_MIN = 35;
+    int S_MIN = 30;
     int S_MAX = 256;
 
     //value (0 - 256)
@@ -172,7 +172,7 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     {
         const Point* p = &squares[i][0];
         int n = (int)squares[i].size();
-        polylines(image, &p, &n, 1, true, Scalar(0,255, 255), 3, CV_8U);
+        polylines(image, &p, &n, 1, true, Scalar(255,0, 0), 1, CV_8U);
     }
 
     imshow(wndname, image);
@@ -233,11 +233,11 @@ int main(int /*argc*/, char** /*argv*/)
 
         //createTrackbars();
 
-        imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        imshow("Original", imgOriginal); //show the original image
+        // imshow("Thresholded Image", imgThresholded); //show the thresholded image
+        // imshow("Original", imgOriginal); //show the original image
 
         findSquares(imgThresholded, squares);
-        drawSquares(imgThresholded, squares);
+        drawSquares(imgOriginal, squares);
 
         if (waitKey(30) == 27)
         {
