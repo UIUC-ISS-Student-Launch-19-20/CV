@@ -5,3 +5,12 @@ cmake_install.cmake
 CMakeCache.txt
 Makefile
 squares
+CTestConfiguration.ini
+CTestCustom.cmake
+CTestTestfile.cmake
+atomic_configure/
+catkin/
+catkin_generated/
+devel/
+gtest/
+.vscode

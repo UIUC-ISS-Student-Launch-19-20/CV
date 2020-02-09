@@ -2,6 +2,11 @@
 // It loads several images sequentially and tries to find squares in
 // each image
 
+#include "ros/ros.h"
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <image_transport/image_transport.h>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -178,73 +183,105 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     imshow(wndname, image);
 }
 
+void image_callback(const sensor_msgs::ImageConstPtr& msg) {
+	cout << "yay" << endl;
+	Mat imgOriginal = cv_bridge::toCvShare(msg, "bgr8")->image;
+	waitKey(30);
+	Mat imgHSV;
 
-int main(int /*argc*/, char** /*argv*/)
-{
-    VideoCapture cap(0);
-    if (!cap.isOpened() )
-    {
-        cout<< "Cannot open the web cam" << endl;
-        return -1;
-    }
-
-    //Mat image;
-    namedWindow(wndname, 1);
+	namedWindow(wndname, 1);
     vector<vector<Point> > squares;
 
+	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
 
-    while (true)
-    {
-        // original image matrix
-        Mat imgOriginal;
-        bool bSuccess = cap.read(imgOriginal);
-        //if shit breaks
-        if (!bSuccess)
-        {
-            cout << "Cannot read video stream frame" << endl;
-            break;
-        }
-        //Mat imgYUV;
-        Mat imgHSV;
-        // cvtColor(imgOriginal, imgYUV, CV_BGR2YUV);
-        // vector<cv::Mat> channels;
-        // split(imgYUV, channels);
-        // equalizeHist(channels[0], channels[0]);
-        // merge(channels, imgYUV);
-        // cvtColor(imgYUV, imgOriginal, CV_YUV2BGR);
+	Mat imgThresholded;
+	inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
+	GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	// erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	findSquares(imgThresholded, squares);
+	drawSquares(imgOriginal, squares);
 
-        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+	// imshow("Thresholded Image", imgThresholded); //show the thresholded image
+    // imshow("Original", imgOriginal); //show the original image
 
-        Mat imgThresholded;
-        inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
-
-        GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
-        //morphological opening (remove small objects from the foreground)
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-
-        //morphological closing (fill small holes in the foreground)
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-
-        //do it again
-        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+}
 
 
-        //createTrackbars();
+int main(int argc, char** argv)
+{
 
-        // imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        // imshow("Original", imgOriginal); //show the original image
+	ros::init(argc, argv, "cv_node");
+	ros::NodeHandle nh;
+	ros::Subscriber image_sub = nh.subscribe("/iris/camera/image_raw", 1, image_callback);
 
-        findSquares(imgThresholded, squares);
-        drawSquares(imgOriginal, squares);
+	ros::spin();
 
-        if (waitKey(30) == 27)
-        {
-            cout << "ya broke it :( " << endl;
-            break;
-       }
-    }
+
+    // VideoCapture cap(0);
+    // if (!cap.isOpened() )
+    // {
+    //     cout<< "Cannot open the web cam" << endl;
+    //     return -1;
+    // }
+
+    //Mat image;
+    // namedWindow(wndname, 1);
+    // vector<vector<Point> > squares;
+
+
+    // while (true)
+    // {
+    //     // original image matrix
+    //     Mat imgOriginal;
+    //     // bool bSuccess = cap.read(imgOriginal);
+    //     // //if shit breaks
+    //     // if (!bSuccess)
+    //     // {
+    //     //     cout << "Cannot read video stream frame" << endl;
+    //     //     break;
+    //     // }
+    //     //Mat imgYUV;
+    //     Mat imgHSV;
+    //     // cvtColor(imgOriginal, imgYUV, CV_BGR2YUV);
+    //     // vector<cv::Mat> channels;
+    //     // split(imgYUV, channels);
+    //     // equalizeHist(channels[0], channels[0]);
+    //     // merge(channels, imgYUV);
+    //     // cvtColor(imgYUV, imgOriginal, CV_YUV2BGR);
+	//
+    //     cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+	//
+    //     Mat imgThresholded;
+    //     inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
+	//
+    //     GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
+    //     //morphological opening (remove small objects from the foreground)
+    //     erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+    //     //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//
+    //     //morphological closing (fill small holes in the foreground)
+    //     //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+    //     erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//
+    //     //do it again
+    //     //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//
+	//
+    //     //createTrackbars();
+	//
+    //     // imshow("Thresholded Image", imgThresholded); //show the thresholded image
+    //     // imshow("Original", imgOriginal); //show the original image
+	//
+    //     findSquares(imgThresholded, squares);
+    //     drawSquares(imgOriginal, squares);
+	//
+    //     if (waitKey(30) == 27)
+    //     {
+    //         cout << "ya broke it :( " << endl;
+    //         break;
+    //    }
+    // }
 
    return 0;
 
