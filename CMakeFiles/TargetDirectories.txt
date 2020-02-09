@@ -1,3 +1,3 @@
-/home/angelina/CV/CMakeFiles/rebuild_cache.dir
-/home/angelina/CV/CMakeFiles/squares.dir
-/home/angelina/CV/CMakeFiles/edit_cache.dir
+/home/ayberk/Documents/student_launch/CV/CMakeFiles/rebuild_cache.dir
+/home/ayberk/Documents/student_launch/CV/CMakeFiles/squares.dir
+/home/ayberk/Documents/student_launch/CV/CMakeFiles/edit_cache.dir

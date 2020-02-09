@@ -32,7 +32,7 @@ string intToString(int number){
     int H_MAX = 100;
 
     //saturation (0 - 256)
-    int S_MIN = 35;    
+    int S_MIN = 35;
     int S_MAX = 256;
 
     //value (0 - 256)
@@ -52,9 +52,9 @@ void createTrackbars(){
 
 	//create trackbars and insert them into window
 	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
-	//the max value the trackbar can move (eg. H_HIGH), 
+	//the max value the trackbar can move (eg. H_HIGH),
 	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
-	//                                  ---->    ---->     ---->      
+	//                                  ---->    ---->     ---->
     createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
     createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
     createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
@@ -221,16 +221,16 @@ int main(int /*argc*/, char** /*argv*/)
         GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
         //morphological opening (remove small objects from the foreground)
         erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
+        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
         //morphological closing (fill small holes in the foreground)
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
+        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
         erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
         //do it again
         //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
-        
+
         //createTrackbars();
 
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
@@ -242,7 +242,7 @@ int main(int /*argc*/, char** /*argv*/)
         if (waitKey(30) == 27)
         {
             cout << "ya broke it :( " << endl;
-            break; 
+            break;
        }
     }
 

@@ -90,11 +90,6 @@ CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/objdetec
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/opencv.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/opencv_modules.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/photo.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/shape.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/shape/emdL1.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/shape/hist_cost.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/shape/shape_distance.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/shape/shape_transformer.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching/detail/blenders.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp
@@ -107,25 +102,8 @@ CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitchin
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching/detail/warpers.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching/detail/warpers_inl.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/stitching/warpers.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/superres.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/superres/optical_flow.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/video.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/video/background_segm.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/video/tracking.hpp
 CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videoio.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/deblurring.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/fast_marching.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/fast_marching_inl.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/frame_source.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/global_motion.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/inpainting.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/log.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/motion_core.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/motion_stabilizing.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/optical_flow.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/outlier_rejection.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/ring_buffer.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/stabilizer.hpp
-CMakeFiles/squares.dir/OpenCV.cpp.o: /usr/local/include/opencv4/opencv2/videostab/wobble_suppression.hpp
 
