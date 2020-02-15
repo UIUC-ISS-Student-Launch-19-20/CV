@@ -17,27 +17,34 @@ int thresh = 50, N = 5;
 const char* wndname = "Square Detection";
 const string trackbarWindowName = "Trackbars";
 
-string intToString(int number){
-
-
-	std::stringstream ss;
-	ss << number;
-	return ss.str();
-}
-
-
     //hue (0 - 256)
     // max = 38 for yellow
-    int H_MIN = 25;
-    int H_MAX = 100;
+    int H_MIN = 22;
+    int H_MAX = 38;
 
     //saturation (0 - 256)
-    int S_MIN = 35;    
+    int S_MIN = 90;    
     int S_MAX = 256;
 
     //value (0 - 256)
-    int V_MIN = 130;
+    int V_MIN = 150;
     int V_MAX = 256;
+
+// int theObject[2] = {0, 0};
+// Rect objectBoundingRectangle = Rect(0, 0, 0, 0);
+// bool objectDetected = false;
+// Mat temp;
+
+
+
+//int to string helper function
+string intToString(int number){
+
+    //this function has a number input and string output
+    std::stringstream ss;
+    ss << number;
+    return ss.str();
+}
 
 void on_trackbar( int, void* )
 {//This function gets called whenever a
@@ -52,9 +59,9 @@ void createTrackbars(){
 
 	//create trackbars and insert them into window
 	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
-	//the max value the trackbar can move (eg. H_HIGH), 
+	//the max value the trackbar can move (eg. H_HIGH),
 	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
-	//                                  ---->    ---->     ---->      
+	//                                  ---->    ---->     ---->
     createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
     createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
     createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
@@ -76,6 +83,7 @@ static double angle( Point pt1, Point pt2, Point pt0 )
     double dy2 = pt2.y - pt0.y;
     return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 }
+
 
 // returns sequence of squares detected on the image.
 // the sequence is stored in the specified memory storage
@@ -127,6 +135,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 
             vector<Point> approx;
 
+
             // test each contour
             for( size_t i = 0; i < contours.size(); i++ )
             {
@@ -156,7 +165,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
                     // if cosines of all angles are small
                     // (all angles are ~90 degree) then write quandrange
                     // vertices to resultant sequence
-                    if( maxCosine < 5)
+                    if( maxCosine < .9)
                         squares.push_back(approx);
                 }
             }
@@ -178,9 +187,30 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     imshow(wndname, image);
 }
 
+void getPosition(Mat& imageThres, Mat& imgOrig) { 
+    Moments oMoments = moments(imageThres);
+        
+    double dM01 = oMoments.m01;
+    double dM10 = oMoments.m10;
+    double dArea = oMoments.m00;
+
+    if (dArea > 10000) {
+        int posX = dM10/dArea;
+        int posY = dM01/dArea;
+            
+        putText(imgOrig,"Tracking object at (" + intToString(posX)+","+intToString(posY)+")",Point(posX,posY),1,1,Scalar(0,0,0),2);
+
+    }
+}
+
 
 int main(int /*argc*/, char** /*argv*/)
 {
+    Mat imgOriginal;
+    Mat imgHSV;
+    Mat imgThresholded;
+    
+
     VideoCapture cap(0);
     if (!cap.isOpened() )
     {
@@ -188,15 +218,12 @@ int main(int /*argc*/, char** /*argv*/)
         return -1;
     }
 
-    //Mat image;
     namedWindow(wndname, 1);
     vector<vector<Point> > squares;
-
-
+    
     while (true)
     {
-        // original image matrix
-        Mat imgOriginal;
+
         bool bSuccess = cap.read(imgOriginal);
         //if shit breaks
         if (!bSuccess)
@@ -204,18 +231,10 @@ int main(int /*argc*/, char** /*argv*/)
             cout << "Cannot read video stream frame" << endl;
             break;
         }
-        //Mat imgYUV;
-        Mat imgHSV;
-        // cvtColor(imgOriginal, imgYUV, CV_BGR2YUV);
-        // vector<cv::Mat> channels;
-        // split(imgYUV, channels);
-        // equalizeHist(channels[0], channels[0]);
-        // merge(channels, imgYUV);
-        // cvtColor(imgYUV, imgOriginal, CV_YUV2BGR);
-
+        
+        
         cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
 
-        Mat imgThresholded;
         inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
 
         GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
@@ -228,16 +247,17 @@ int main(int /*argc*/, char** /*argv*/)
         erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
         //do it again
-        //erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
-        
-        //createTrackbars();
+        getPosition(imgThresholded, imgOriginal);
+
+        createTrackbars();
 
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
         imshow("Original", imgOriginal); //show the original image
 
         findSquares(imgThresholded, squares);
-        drawSquares(imgThresholded, squares);
+        drawSquares(imgOriginal, squares);
 
         if (waitKey(30) == 27)
         {
