@@ -1,3 +1,0 @@
-/home/angelina/CV/CMakeFiles/rebuild_cache.dir
-/home/angelina/CV/CMakeFiles/squares.dir
-/home/angelina/CV/CMakeFiles/edit_cache.dir
