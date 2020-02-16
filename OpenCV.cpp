@@ -23,7 +23,7 @@ const string trackbarWindowName = "Trackbars";
     int H_MAX = 38;
 
     //saturation (0 - 256)
-    int S_MIN = 90;    
+    int S_MIN = 90;
     int S_MAX = 256;
 
     //value (0 - 256)
@@ -181,91 +181,67 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     {
         const Point* p = &squares[i][0];
         int n = (int)squares[i].size();
-        polylines(image, &p, &n, 1, true, Scalar(0,255, 255), 3, CV_8U);
+        polylines(image, &p, &n, 1, true, Scalar(0,0, 255), 3, CV_8U);
     }
 
     imshow(wndname, image);
 }
 
-void getPosition(Mat& imageThres, Mat& imgOrig) { 
+std::pair<int, int> getPosition(Mat& imageThres, Mat& imgOrig) {
     Moments oMoments = moments(imageThres);
-        
+
     double dM01 = oMoments.m01;
     double dM10 = oMoments.m10;
     double dArea = oMoments.m00;
 
+	int posX;
+	int posY;
+
     if (dArea > 10000) {
-        int posX = dM10/dArea;
-        int posY = dM01/dArea;
-            
-        putText(imgOrig,"Tracking object at (" + intToString(posX)+","+intToString(posY)+")",Point(posX,posY),1,1,Scalar(0,0,0),2);
+        posX = dM10/dArea;
+        posY = dM01/dArea;
+
+        putText(imgOrig,"(" + intToString(posX)+","+intToString(posY)+")",Point(posX,posY),1,1,Scalar(0,0,0),2);
 
     }
+
+	return std::make_pair(posX, posY);
 }
 
-
-int main(int /*argc*/, char** /*argv*/)
-{
-    Mat imgOriginal;
-    Mat imgHSV;
+std::pair<int, int> detect(Mat imgOriginal) {
+	Mat imgHSV;
     Mat imgThresholded;
-    
 
-    VideoCapture cap(0);
-    if (!cap.isOpened() )
-    {
-        cout<< "Cannot open the web cam" << endl;
-        return -1;
-    }
-
-    namedWindow(wndname, 1);
+	namedWindow(wndname, 1);
     vector<vector<Point> > squares;
-    
-    while (true)
-    {
 
-        bool bSuccess = cap.read(imgOriginal);
-        //if shit breaks
-        if (!bSuccess)
-        {
-            cout << "Cannot read video stream frame" << endl;
-            break;
-        }
-        
-        
-        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
 
-        inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
+	inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
 
-        GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
-        //morphological opening (remove small objects from the foreground)
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
+	GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
+	//morphological opening (remove small objects from the foreground)
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
-        //morphological closing (fill small holes in the foreground)
-        //dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//morphological closing (fill small holes in the foreground)
+	//dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
-        //do it again
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//do it again
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
 
-        getPosition(imgThresholded, imgOriginal);
+	std::pair<int, int> position = getPosition(imgThresholded, imgOriginal);
 
-        createTrackbars();
+	// createTrackbars();
 
-        imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        imshow("Original", imgOriginal); //show the original image
+	// imshow("Thresholded Image", imgThresholded); //show the thresholded image
+	//imshow("Original", imgOriginal); //show the original image
 
-        findSquares(imgThresholded, squares);
-        drawSquares(imgOriginal, squares);
+	findSquares(imgThresholded, squares);
+	drawSquares(imgOriginal, squares);
 
-        if (waitKey(30) == 27)
-        {
-            cout << "ya broke it :( " << endl;
-            break; 
-       }
-    }
+    return position;
 
-   return 0;
 
 }
