@@ -22,27 +22,42 @@ int thresh = 50, N = 5;
 const char* wndname = "Square Detection";
 const string trackbarWindowName = "Trackbars";
 
-string intToString(int number){
-
-
-	std::stringstream ss;
-	ss << number;
-	return ss.str();
-}
-
-
     //hue (0 - 256)
     // max = 38 for yellow
+<<<<<<< HEAD
     int H_MIN = 20;
     int H_MAX = 100;
 
     //saturation (0 - 256)
     int S_MIN = 30;
+=======
+    int H_MIN = 22;
+    int H_MAX = 38;
+
+    //saturation (0 - 256)
+    int S_MIN = 90;
+>>>>>>> master
     int S_MAX = 256;
 
     //value (0 - 256)
-    int V_MIN = 130;
+    int V_MIN = 150;
     int V_MAX = 256;
+
+// int theObject[2] = {0, 0};
+// Rect objectBoundingRectangle = Rect(0, 0, 0, 0);
+// bool objectDetected = false;
+// Mat temp;
+
+
+
+//int to string helper function
+string intToString(int number){
+
+    //this function has a number input and string output
+    std::stringstream ss;
+    ss << number;
+    return ss.str();
+}
 
 void on_trackbar( int, void* )
 {//This function gets called whenever a
@@ -81,6 +96,7 @@ static double angle( Point pt1, Point pt2, Point pt0 )
     double dy2 = pt2.y - pt0.y;
     return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 }
+
 
 // returns sequence of squares detected on the image.
 // the sequence is stored in the specified memory storage
@@ -132,6 +148,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 
             vector<Point> approx;
 
+
             // test each contour
             for( size_t i = 0; i < contours.size(); i++ )
             {
@@ -161,7 +178,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
                     // if cosines of all angles are small
                     // (all angles are ~90 degree) then write quandrange
                     // vertices to resultant sequence
-                    if( maxCosine < 5)
+                    if( maxCosine < .9)
                         squares.push_back(approx);
                 }
             }
@@ -177,12 +194,17 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     {
         const Point* p = &squares[i][0];
         int n = (int)squares[i].size();
+<<<<<<< HEAD
         polylines(image, &p, &n, 1, true, Scalar(255,0, 0), 1, CV_8U);
+=======
+        polylines(image, &p, &n, 1, true, Scalar(0,0, 255), 3, CV_8U);
+>>>>>>> master
     }
 
     imshow(wndname, image);
 }
 
+<<<<<<< HEAD
 void image_callback(const sensor_msgs::ImageConstPtr& msg) {
 	cout << "yay" << endl;
 	Mat imgOriginal = cv_bridge::toCvShare(msg, "bgr8")->image;
@@ -282,7 +304,63 @@ int main(int argc, char** argv)
     //         break;
     //    }
     // }
+=======
+std::pair<int, int> getPosition(Mat& imageThres, Mat& imgOrig) {
+    Moments oMoments = moments(imageThres);
 
-   return 0;
+    double dM01 = oMoments.m01;
+    double dM10 = oMoments.m10;
+    double dArea = oMoments.m00;
+
+	int posX;
+	int posY;
+
+    if (dArea > 10000) {
+        posX = dM10/dArea;
+        posY = dM01/dArea;
+
+        putText(imgOrig,"(" + intToString(posX)+","+intToString(posY)+")",Point(posX,posY),1,1,Scalar(0,0,0),2);
+
+    }
+
+	return std::make_pair(posX, posY);
+}
+
+std::pair<int, int> detect(Mat imgOriginal) {
+	Mat imgHSV;
+    Mat imgThresholded;
+
+	namedWindow(wndname, 1);
+    vector<vector<Point> > squares;
+
+	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+
+	inRange(imgHSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), imgThresholded); //Threshold the image
+
+	GaussianBlur(imgThresholded, imgThresholded, cv::Size(3, 3), 0);   //Blur Effect
+	//morphological opening (remove small objects from the foreground)
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	//dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+
+	//morphological closing (fill small holes in the foreground)
+	//dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+
+	//do it again
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
+
+	std::pair<int, int> position = getPosition(imgThresholded, imgOriginal);
+
+	// createTrackbars();
+
+	// imshow("Thresholded Image", imgThresholded); //show the thresholded image
+	//imshow("Original", imgOriginal); //show the original image
+
+	findSquares(imgThresholded, squares);
+	drawSquares(imgOriginal, squares);
+
+    return position;
+>>>>>>> master
+
 
 }
